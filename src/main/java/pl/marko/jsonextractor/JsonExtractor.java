@@ -22,4 +22,8 @@ public class JsonExtractor {
     public Stream<Object> extract(JsonNode node){
         return treeWalker.walk(node);
     }
+
+    public static JsonExtractor allFields() {
+        return new JsonExtractor(new AllFieldsMatcher(), new SimpleValueExtractor());
+    }
 }
