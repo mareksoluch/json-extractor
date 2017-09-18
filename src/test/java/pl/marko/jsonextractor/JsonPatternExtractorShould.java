@@ -3,6 +3,8 @@ package pl.marko.jsonextractor;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,5 +66,16 @@ public class JsonPatternExtractorShould extends JsonExtractorShould {
         assertThat(values).containsExactly(1, 2, 4, 5);
     }
 
+    @Test public void
+    extractGroupedFields() throws Exception {
+        JsonNode jsonNode = json("{\"array\": [{\"a\":1,\"b\":2},{\"x\":3,\"a\":4}], \"bob\": 5}");
+
+        Map<String, List<Object>> values = JsonExtractor.byPattern("a", "b.*").extractGrouped(jsonNode);
+
+        assertThat(values.keySet()).containsExactly("a", "b", "bob");
+        assertThat(values.get("a")).containsExactly(1, 4);
+        assertThat(values.get("b")).containsExactly(2);
+        assertThat(values.get("bob")).containsExactly(5);
+    }
 
 }

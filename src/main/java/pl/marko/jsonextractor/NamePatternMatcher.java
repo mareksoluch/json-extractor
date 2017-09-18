@@ -1,6 +1,5 @@
 package pl.marko.jsonextractor;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import pl.marko.jsonextractor.treewalker.NodeMatcher;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class NamePatternMatcher implements NodeMatcher {
     }
 
     @Override
-    public boolean matchesPattern(JsonNode node, String nodeName) {
+    public boolean matchesPattern(String nodeName) {
         return keyPatterns.stream()
                 .anyMatch(pattern -> pattern.matcher(nodeName).matches());
     }

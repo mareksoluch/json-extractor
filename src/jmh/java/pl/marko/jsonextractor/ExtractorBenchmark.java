@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -21,9 +23,11 @@ public class ExtractorBenchmark {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static List<JsonNode> readNodes(String jsonFile) throws IOException {
-        try (Stream<String> stream = Files.lines(Paths.get(jsonFile))) {
-            return stream.flatMap(ExtractorBenchmark::readJson)
+    private static List<JsonNode> readNodes(String resourcePath) throws IOException {
+
+        try (InputStream resource = ExtractorBenchmark.class.getResourceAsStream(resourcePath)) {
+            Stream<String> lines = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines();
+            return lines.flatMap(ExtractorBenchmark::readJson)
                     .collect(toList());
         }
     }
@@ -43,7 +47,7 @@ public class ExtractorBenchmark {
 
         @Setup(Level.Trial)
         public void doSetup() throws IOException {
-            nodes = readNodes(MyState.class.getResource("/payload.json").getFile());
+            nodes = readNodes("/payload.json");
             extractor = JsonExtractor.byPattern(".*Id.*", ".*Name.*");
         }
     }

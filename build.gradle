@@ -1,23 +1,85 @@
-apply plugin: 'java'
-apply plugin: 'maven'
-
-group = 'org.solo'
-version = '1.0-SNAPSHOT'
-
-description = """"""
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-
-
-repositories {
-        
-     maven { url "http://repo.maven.apache.org/maven2" }
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.3"
+    }
 }
+
+apply plugin: "me.champeau.gradle.jmh"
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    //apply plugin: 'maven'
+
+    group = 'org.solo'
+    version = '1.0-SNAPSHOT'
+
+    description = """Library to extract data from JSON"""
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        jcenter()
+    }
+}
+
+
+jmh {
+    include = 'pl\\.marko\\.jsonextractor\\.*'
+    humanOutputFile = null
+    warmupIterations = 1
+    iterations = 1
+    duplicateClassesStrategy = 'warn'
+}
+
+subprojects {
+    apply plugin: 'me.champeau.gradle.jmh'
+
+    jmh {
+        include = 'pl\\.marko\\.jsonextractor\\.*'
+        humanOutputFile = null
+        warmupIterations = 1
+        iterations = 1
+        duplicateClassesStrategy = 'warn'
+    }
+
+}
+
+//repositories {
+//    jcenter()
+//    maven {
+//        url "https://plugins.gradle.org/m2/"
+//    }
+//}
 dependencies {
-    compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version:'2.7.5'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.7.5'
-    testCompile group: 'org.assertj', name: 'assertj-core', version:'3.6.2'
-    testCompile group: 'junit', name: 'junit', version:'4.12'
+    compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.7.5'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.5'
+    testCompile 'org.assertj:assertj-core:3.6.2'
+    testCompile 'junit:junit:4.12'
+
+
 }
+
+
+//buildscript {
+//    repositories {
+//        jcenter()
+//        maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+//    }
+//    dependencies {
+//        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.3"
+//        jmh 'org.openjdk.jmh:jmh-core:1.19'
+//        jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.19'
+//    }
+//}
+
+

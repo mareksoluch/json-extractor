@@ -3,9 +3,12 @@ package pl.marko.jsonextractor.treewalker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.empty;
 import static java.util.stream.StreamSupport.stream;
 
@@ -20,30 +23,40 @@ public class JsonTreeJsonWalker {
     }
 
     public Stream<Object> walk(JsonNode node) {
-        return walk(node, false);
+        return walk(node, null)
+                .map(Pair::right);
     }
 
-    private Stream<Object> walk(JsonNode node, boolean nodeMatches) {
+    private Stream<Pair> walk(JsonNode node, String propertyName) {
         if (node.isArray()) {
-            return walkArray(node, nodeMatches);
+            return walkArray(node, propertyName);
         }
         if (node.isObject()) {
             return walkObject(node);
         }
-        if (nodeMatches) {
-            return nodeValueExtractor.valueFrom(node);
+        if (propertyMatches(propertyName)) {
+            return getSimpleValue(node, propertyName);
         }
         return empty();
     }
 
-    private Stream<Object> walkArray(JsonNode node, boolean propertyMatched) {
-        return elementsStream(node)
-                .flatMap(el -> walk(el,propertyMatched));
+    private Stream<Pair> getSimpleValue(JsonNode node, String propertyName) {
+        return nodeValueExtractor.valueFrom(node)
+                .map(value -> pair(propertyName, value));
     }
 
-    private Stream<Object> walkObject(JsonNode node) {
+    private boolean propertyMatches(String propertyName) {
+        return propertyName!=null && nodeMatcher.matchesPattern(propertyName);
+    }
+
+    private Stream<Pair> walkArray(JsonNode node, String propertyName) {
+        return elementsStream(node)
+                .flatMap(el -> walk(el,propertyName));
+    }
+
+    private Stream<Pair> walkObject(JsonNode node) {
         return fieldsStream(node)
-                .flatMap(field -> walk(field.getValue(), nodeMatcher.matchesPattern(field.getValue(), field.getKey())));
+                .flatMap(field -> walk(field.getValue(), field.getKey()));
 
     }
 
@@ -56,6 +69,37 @@ public class JsonTreeJsonWalker {
         return stream(iterable.spliterator(), false);
     }
 
+    public Map<String,List<Object>> walkGrouped(JsonNode node) {
+        return walk(node, null)
+                .collect(toMap());
+
+    }
+
+    private Collector<Pair, ?, Map<String, List<Object>>> toMap() {
+        return groupingBy(Pair::left, mapping(Pair::right, toList()));
+    }
+
+    private Pair pair(String left, Object right){
+        return new Pair(left, right);
+    }
+
+    private class Pair {
+        private String left;
+
+        private Object right;
+
+        private Pair(String left, Object right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        private String left() {
+            return left;
+        }
+        private Object right() {
+            return right;
+        }
+    }
 }
 
 
