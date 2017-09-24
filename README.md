@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/mareksoluch/json-extractor.svg?branch=master)](https://travis-ci.org/mareksoluch/json-extractor)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # json-extractor
 This is a simple library that provides possibility to extract json field values basing on fields' names.

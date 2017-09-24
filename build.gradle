@@ -1,85 +1,36 @@
 buildscript {
+    ext.your_name = 'Marek Soluch'
+    ext.your_email = 'marek.soluchl@gmail.com'
+    ext.your_github_name = 'mareksoluch'
+
+    ext.project_name = 'json-extractor'
+    ext.project_description = """Library to extract data from JSON"""
+    ext.project_group = 'org.solo'
+    ext.project_artifact = 'jsonextractor'
+    ext.project_version = '1.0.2'
+    ext.project_license = 'The Apache Software License, Version 2.0' // the full license name
+    ext.project_license_tag = 'Apache-2.0' // the license tag name
+    ext.project_license_url = 'https://www.apache.org/licenses/LICENSE-2.0.txt' // link to the license
+
     repositories {
+        mavenCentral()
         jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.3"
     }
 }
 
-apply plugin: "me.champeau.gradle.jmh"
-
+plugins {
+    id "me.champeau.gradle.jmh" version "0.4.3"
+    id "com.jfrog.bintray" version "1.7"
+}
 allprojects {
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    //apply plugin: 'maven'
-
-    group = 'org.solo'
-    version = '1.0-SNAPSHOT'
-
-    description = """Library to extract data from JSON"""
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
-    repositories {
-        jcenter()
-    }
+    apply plugin: "me.champeau.gradle.jmh"
 }
 
-
-jmh {
-    include = 'pl\\.marko\\.jsonextractor\\.*'
-    humanOutputFile = null
-    warmupIterations = 1
-    iterations = 1
-    duplicateClassesStrategy = 'warn'
-}
-
-subprojects {
-    apply plugin: 'me.champeau.gradle.jmh'
-
-    jmh {
-        include = 'pl\\.marko\\.jsonextractor\\.*'
-        humanOutputFile = null
-        warmupIterations = 1
-        iterations = 1
-        duplicateClassesStrategy = 'warn'
-    }
-
-}
-
-//repositories {
-//    jcenter()
-//    maven {
-//        url "https://plugins.gradle.org/m2/"
-//    }
-//}
 dependencies {
     compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.7.5'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.5'
     testCompile 'org.assertj:assertj-core:3.6.2'
     testCompile 'junit:junit:4.12'
-
-
 }
 
-
-//buildscript {
-//    repositories {
-//        jcenter()
-//        maven {
-//            url "https://plugins.gradle.org/m2/"
-//        }
-//    }
-//    dependencies {
-//        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.3"
-//        jmh 'org.openjdk.jmh:jmh-core:1.19'
-//        jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.19'
-//    }
-//}
-
-
+apply from: 'bintray.deploy.setup.gradle'
