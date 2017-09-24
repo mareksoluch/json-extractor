@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-public class JsonExtractorShould {
-    protected JsonNode json(String content) throws IOException {
+abstract class JsonExtractorShould {
+    JsonNode json(String content) throws IOException {
         return new ObjectMapper().readTree(content);
     }
 }
