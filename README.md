@@ -10,7 +10,7 @@ Algorithm of fields selections is either extract all fields or base on regular e
 Extract all fields' values:
 ```java
 JsonNode jsonNode = loadJson();
-Stream<Object> values = JsonExtractor.byPattern(".*Id.*", ".*name.*").extract(jsonNode);
+Stream<Object> values = JsonExtractor.allFields().extract(jsonNode);
 values.forEach(value -> LOG.debug("Extracted value: {}", value));
 ```
 
