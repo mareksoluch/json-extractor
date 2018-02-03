@@ -1,12 +1,11 @@
-package pl.marko.jsonextractor;
+package pl.marko.jsonextractor.jsonwalker;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import pl.marko.jsonextractor.treewalker.NodeValueExtractor;
 
 import java.util.stream.Stream;
 
-class SimpleValueExtractor implements NodeValueExtractor {
-    Stream<Object> getNumber(JsonNode node) {
+class SimpleValueExtractor {
+    private Stream<Object> getNumber(JsonNode node) {
         switch (node.numberType()) {
             case BIG_DECIMAL:
                 return Stream.of(node.decimalValue());
@@ -22,8 +21,7 @@ class SimpleValueExtractor implements NodeValueExtractor {
         return Stream.empty();
     }
 
-    @Override
-    public Stream<Object> valueFrom(JsonNode node) {
+    Stream<Object> valueFrom(JsonNode node) {
         switch (node.getNodeType()) {
             case STRING:
                 return Stream.of(node.textValue());

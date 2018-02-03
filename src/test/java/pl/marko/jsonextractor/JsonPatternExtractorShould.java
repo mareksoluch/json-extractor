@@ -2,80 +2,92 @@ package pl.marko.jsonextractor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(Parameterized.class)
 public class JsonPatternExtractorShould extends JsonExtractorShould {
 
-    @Test public void
-    extractSimpleValueFromJson() throws Exception {
-        JsonNode jsonNode = json("{\"a\": 1, \"b\":2}");
+    private String name;
+    private String json;
+    private String[] pattern;
+    private Object[] result;
 
-        Stream<Object> values = JsonExtractor.byPattern("a").extract(jsonNode);
+    public JsonPatternExtractorShould(String name,String json, String[] pattern, Object[] result) {
+        this.name = name;
+        this.json = json;
+        this.pattern = pattern;
+        this.result = result;
+    }
 
-        assertThat(values).containsExactly(1);
+    @Parameters( name = "{0}" )
+    public static Collection<Object[]> data() {
+        return Arrays.asList(
+                test("extractSimpleValueFromJson",
+                        "{\"a\": 1, \"b\":2}",
+                        pattern("a"),
+                        result(1)),
+                test("extractSimpleValueFromComplexJson",
+                        "{\"a\": 1, \"b\":2, \"child\": {\"a\":3, \"x\":4, \"anotherChild\":{\"c\":\"ala\", \"a\":\"ma\"}}}",
+                        pattern("a"),
+                        result(1, 3, "ma")),
+                test("shouldMatchNotTrivialPattern",
+                        "{\"1111a\": 1, \"b\":2, \"child\": {\"a\":3, \"x\":4, \"anotherChild\":{\"c\":\"ala\", \"2222a\":\"ma\"}}}",
+                        pattern(".*a"),
+                        result(1, 3, "ma")),
+                test("workWithArrays",
+                        "{\"array\": [{\"a\":1,\"b\":2},{\"x\":1,\"a\":3}]}",
+                        pattern("a"),
+                        result(1, 3)),
+                test("workWithArraysOfSimpleValues",
+                        "{\"a\": [1,2,3,4]}",
+                        pattern("a"),
+                        result(1, 2, 3, 4)),
+                test("processMoreThanOnePattern",
+                        "{\"array\": [{\"a\":1,\"b\":2},{\"x\":3,\"a\":4}], \"bob\": 5}",
+                        pattern("a", "b.*"),
+                        result(1, 2, 4, 5)));
+    }
+
+    private static Object[] test(String name,String json, String[] pattern, Object[] result) {
+        return new Object[]{name, json, pattern, result};
+    }
+
+    private static Object[] result(Object... result) {
+        return result;
+    }
+
+    private static String[] pattern(String... a) {
+        return a;
     }
 
     @Test public void
-    extractSimpleValueFromComplexJson() throws Exception {
-        JsonNode jsonNode = json("{\"a\": 1, \"b\":2, \"child\": {\"a\":3, \"x\":4, \"anotherChild\":{\"c\":\"ala\", \"a\":\"ma\"}}}");
+    extractFieldsFromJson() throws Exception {
+        JsonNode jsonNode = json(json);
 
-        Stream<Object> values = JsonExtractor.byPattern("a").extract(jsonNode);
+        Stream<Object> values = extractor(pattern).extract(jsonNode);
 
-        assertThat(values).containsExactly(1, 3, "ma");
+        assertThat(values).containsExactly(result);
     }
 
     @Test public void
-    shouldMatchNotTrivialPattern() throws Exception {
-        JsonNode jsonNode = json("{\"1111a\": 1, \"b\":2, \"child\": {\"a\":3, \"x\":4, \"anotherChild\":{\"c\":\"ala\", " +
-                "\"2222a\":\"ma\"}}}");
+    extractFieldsFromStream() throws Exception {
+        InputStream jsonNode = jsonStream(json);
 
-        Stream<Object> values = JsonExtractor.byPattern(".*a").extract(jsonNode);
+        Stream<Object> values = extractor(pattern).streamed().extract(jsonNode);
 
-        assertThat(values).containsExactly(1, 3, "ma");
+        assertThat(values).containsExactly(result);
     }
 
-    @Test public void
-    workWithArrays() throws Exception {
-        JsonNode jsonNode = json("{\"array\": [{\"a\":1,\"b\":2},{\"x\":1,\"a\":3}]}");
-
-        Stream<Object> values = JsonExtractor.byPattern("a").extract(jsonNode);
-
-        assertThat(values).containsExactly(1, 3);
+    protected JsonExtractor extractor(String... pattern) {
+        return JsonExtractor.byPattern(pattern);
     }
-
-    @Test public void
-    workWithArraysOfSimpleValues() throws Exception {
-        JsonNode jsonNode = json("{\"a\": [1,2,3,4]}");
-
-        Stream<Object> values = JsonExtractor.byPattern("a").extract(jsonNode);
-
-        assertThat(values).containsExactly(1, 2, 3, 4);
-    }
-
-    @Test public void
-    processMoreThanOnePattern() throws Exception {
-        JsonNode jsonNode = json("{\"array\": [{\"a\":1,\"b\":2},{\"x\":3,\"a\":4}], \"bob\": 5}");
-
-        Stream<Object> values = JsonExtractor.byPattern("a", "b.*").extract(jsonNode);
-
-        assertThat(values).containsExactly(1, 2, 4, 5);
-    }
-
-    @Test public void
-    extractGroupedFields() throws Exception {
-        JsonNode jsonNode = json("{\"array\": [{\"a\":1,\"b\":2},{\"x\":3,\"a\":4}], \"bob\": 5}");
-
-        Map<String, List<Object>> values = JsonExtractor.byPattern("a", "b.*").extractGrouped(jsonNode);
-
-        assertThat(values.keySet()).containsExactly("a", "b", "bob");
-        assertThat(values.get("a")).containsExactly(1, 4);
-        assertThat(values.get("b")).containsExactly(2);
-        assertThat(values.get("bob")).containsExactly(5);
-    }
-
 }

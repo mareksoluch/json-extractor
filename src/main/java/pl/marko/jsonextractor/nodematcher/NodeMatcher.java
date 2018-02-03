@@ -1,4 +1,4 @@
-package pl.marko.jsonextractor.treewalker;
+package pl.marko.jsonextractor.nodematcher;
 
 public interface NodeMatcher {
 

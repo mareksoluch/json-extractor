@@ -1,6 +1,4 @@
-package pl.marko.jsonextractor;
-
-import pl.marko.jsonextractor.treewalker.NodeMatcher;
+package pl.marko.jsonextractor.nodematcher;
 
 import java.util.List;
 import java.util.regex.Pattern;

@@ -1,30 +1,54 @@
-package pl.marko.jsonextractor.treewalker;
+package pl.marko.jsonextractor.jsonwalker;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import pl.marko.jsonextractor.nodematcher.NodeMatcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.empty;
 import static java.util.stream.StreamSupport.stream;
+import static pl.marko.jsonextractor.jsonwalker.Pair.toMap;
 
-public class JsonTreeJsonWalker {
+public class TreeJsonWalker implements JsonWalker {
 
-    private final NodeValueExtractor nodeValueExtractor;
+    private final SimpleValueExtractor nodeValueExtractor = new SimpleValueExtractor();
     private final NodeMatcher nodeMatcher;
 
-    public JsonTreeJsonWalker(NodeMatcher patternMatcher, NodeValueExtractor nodeValueExtractor) {
-        this.nodeValueExtractor = nodeValueExtractor;
+    public TreeJsonWalker(NodeMatcher patternMatcher) {
         this.nodeMatcher = patternMatcher;
     }
 
+    @Override
+    public Stream<Object> walk(InputStream json) throws IOException {
+        return walk(jsonNode(json));
+    }
+
+    @Override
+    public Map<String,List<Object>> walkGrouped(InputStream json) throws IOException {
+        return walkGrouped(jsonNode(json));
+    }
+
+    @Override
     public Stream<Object> walk(JsonNode node) {
         return walk(node, null)
                 .map(Pair::right);
+    }
+
+    @Override
+    public Map<String,List<Object>> walkGrouped(JsonNode node) {
+        return walk(node, null)
+                .collect(toMap());
+
+    }
+
+    private JsonNode jsonNode(InputStream json) throws IOException {
+        return new ObjectMapper().readTree(json);
     }
 
     private Stream<Pair> walk(JsonNode node, String propertyName) {
@@ -69,36 +93,9 @@ public class JsonTreeJsonWalker {
         return stream(iterable.spliterator(), false);
     }
 
-    public Map<String,List<Object>> walkGrouped(JsonNode node) {
-        return walk(node, null)
-                .collect(toMap());
-
-    }
-
-    private Collector<Pair, ?, Map<String, List<Object>>> toMap() {
-        return groupingBy(Pair::left, mapping(Pair::right, toList()));
-    }
 
     private Pair pair(String left, Object right){
         return new Pair(left, right);
-    }
-
-    private class Pair {
-        private String left;
-
-        private Object right;
-
-        private Pair(String left, Object right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        private String left() {
-            return left;
-        }
-        private Object right() {
-            return right;
-        }
     }
 }
 
