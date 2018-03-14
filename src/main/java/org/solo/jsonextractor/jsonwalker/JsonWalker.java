@@ -1,4 +1,4 @@
-package pl.marko.jsonextractor.jsonwalker;
+package org.solo.jsonextractor.jsonwalker;
 
 public interface JsonWalker extends JsonStreamWalker, JsonNodeWalker {
 }

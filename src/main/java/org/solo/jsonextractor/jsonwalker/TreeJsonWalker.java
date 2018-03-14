@@ -1,9 +1,9 @@
-package pl.marko.jsonextractor.jsonwalker;
+package org.solo.jsonextractor.jsonwalker;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import pl.marko.jsonextractor.nodematcher.NodeMatcher;
+import org.solo.jsonextractor.nodematcher.NodeMatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Stream.empty;
 import static java.util.stream.StreamSupport.stream;
-import static pl.marko.jsonextractor.jsonwalker.Pair.toMap;
 
 public class TreeJsonWalker implements JsonWalker {
 
@@ -43,7 +42,7 @@ public class TreeJsonWalker implements JsonWalker {
     @Override
     public Map<String,List<Object>> walkGrouped(JsonNode node) {
         return walk(node, null)
-                .collect(toMap());
+                .collect(Pair.toMap());
 
     }
 

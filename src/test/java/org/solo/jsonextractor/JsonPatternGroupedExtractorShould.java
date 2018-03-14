@@ -1,4 +1,4 @@
-package pl.marko.jsonextractor;
+package org.solo.jsonextractor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;

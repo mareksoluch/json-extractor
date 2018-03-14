@@ -1,4 +1,4 @@
-package pl.marko.jsonextractor.jsonwalker;
+package org.solo.jsonextractor.jsonwalker;
 
 import java.io.IOException;
 import java.io.InputStream;

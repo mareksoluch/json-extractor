@@ -1,9 +1,9 @@
-package pl.marko.jsonextractor.jsonwalker;
+package org.solo.jsonextractor.jsonwalker;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import pl.marko.jsonextractor.nodematcher.NodeMatcher;
+import org.solo.jsonextractor.nodematcher.NodeMatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static pl.marko.jsonextractor.jsonwalker.Pair.toMap;
 
 public class StreamJsonWalker implements JsonStreamWalker {
 
@@ -36,7 +35,7 @@ public class StreamJsonWalker implements JsonStreamWalker {
     @Override
     public Map<String, List<Object>> walkGrouped(InputStream json) throws IOException {
         return streamJson(json)
-                .collect(toMap());
+                .collect(Pair.toMap());
     }
 
     private Stream<Pair> streamJson(InputStream json) throws IOException {

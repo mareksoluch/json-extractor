@@ -1,4 +1,4 @@
-package pl.marko.jsonextractor.nodematcher;
+package org.solo.jsonextractor.nodematcher;
 
 public interface NodeMatcher {
 

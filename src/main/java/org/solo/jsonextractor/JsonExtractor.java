@@ -1,13 +1,13 @@
-package pl.marko.jsonextractor;
+package org.solo.jsonextractor;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import pl.marko.jsonextractor.jsonwalker.ComposedJsonWalker;
-import pl.marko.jsonextractor.jsonwalker.JsonWalker;
-import pl.marko.jsonextractor.jsonwalker.StreamJsonWalker;
-import pl.marko.jsonextractor.jsonwalker.TreeJsonWalker;
-import pl.marko.jsonextractor.nodematcher.NodeMatcher;
-import pl.marko.jsonextractor.nodematcher.AllFieldsMatcher;
-import pl.marko.jsonextractor.nodematcher.NamePatternMatcher;
+import org.solo.jsonextractor.jsonwalker.ComposedJsonWalker;
+import org.solo.jsonextractor.jsonwalker.JsonWalker;
+import org.solo.jsonextractor.jsonwalker.StreamJsonWalker;
+import org.solo.jsonextractor.jsonwalker.TreeJsonWalker;
+import org.solo.jsonextractor.nodematcher.AllFieldsMatcher;
+import org.solo.jsonextractor.nodematcher.NamePatternMatcher;
+import org.solo.jsonextractor.nodematcher.NodeMatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,6 @@ public class JsonExtractor {
     public JsonExtractor streamed() {
         ComposedJsonWalker composedJsonWalker = new ComposedJsonWalker(new StreamJsonWalker(this.nodeMatcher), this.treeWalker);
         return new JsonExtractor(this.nodeMatcher, composedJsonWalker);
-
     }
 
     public Map<String, List<Object>> extractGrouped(JsonNode node) {

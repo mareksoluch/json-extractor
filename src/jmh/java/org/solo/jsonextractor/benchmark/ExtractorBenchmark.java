@@ -1,10 +1,10 @@
-package pl.marko.jsonextractor.benchmark;
+package org.solo.jsonextractor.benchmark;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-import pl.marko.jsonextractor.JsonExtractor;
+import org.solo.jsonextractor.JsonExtractor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
